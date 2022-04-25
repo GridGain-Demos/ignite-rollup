@@ -15,18 +15,14 @@ public class RollupClient {
                     .setIndexedTypes(RollupKey.class, RollupValue.class);
             var baseCache = ignite.getOrCreateCache(baseTableConfiguration);
 
-            var rollupTableConfiguration = new CacheConfiguration<Long,RollupValue>()
+            var rollupTableConfiguration = new CacheConfiguration<RollupKey,RollupValue>()
                     .setName("ROLLUP")
                     .setBackups(1)
-                    .setQueryEntities(Collections.singleton(
-                            new QueryEntity(Long.class, RollupValue.class)
-                                    .addQueryField("id", Long.class.getName(), null)
-                                    .addQueryField("value", Long.class.getName(), null)
-                                    .setKeyFieldName("id")
-                    ));
+                    .setIndexedTypes(RollupKey.class, RollupValue.class);
             var rollupCache = ignite.getOrCreateCache(rollupTableConfiguration);
 
-            ignite.services().deployNodeSingleton("Rollup", new RollupServiceImpl());
+            ignite.services().deployNodeSingleton("Rollup 1", new RollupServiceImpl(1));
+            ignite.services().deployNodeSingleton("Rollup 2", new TimedRollupServiceImpl(2));
         }
     }
 }

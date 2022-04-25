@@ -6,35 +6,30 @@ import org.apache.ignite.cache.CacheEntryProcessor;
 import org.apache.ignite.cache.query.ContinuousQuery;
 import org.apache.ignite.cache.query.QueryCursor;
 import org.apache.ignite.lang.IgniteAsyncCallback;
-import org.apache.ignite.lang.IgniteBiTuple;
 import org.apache.ignite.resources.IgniteInstanceResource;
 import org.apache.ignite.services.Service;
 import org.apache.ignite.services.ServiceContext;
 
+import javax.cache.Cache;
 import javax.cache.event.CacheEntryEvent;
 import javax.cache.event.CacheEntryListenerException;
 import javax.cache.event.CacheEntryUpdatedListener;
-import javax.cache.event.EventType;
-import javax.cache.processor.EntryProcessorException;
-import javax.cache.processor.MutableEntry;
-import java.util.function.Supplier;
 
 public class RollupServiceImpl implements RollupService, Service {
     @IgniteInstanceResource
     Ignite ignite;
 
-    private Supplier<RollupValue> valueSupplier;
-
     private IgniteCache<RollupKey,RollupValue> sourceCache;
-    private IgniteCache<Long,RollupValue> destCache;
-
-//    @FunctionalInterface
-//    public interface UpdateRollup<S1,S2> {
-//        void updateRollup(EventType e, S1 k, S2 v);
-//    }
+    private IgniteCache<RollupKey,RollupValue> destCache;
 
     private ContinuousQuery<RollupKey,RollupValue> listener;
-    private QueryCursor cursor;
+    private QueryCursor<Cache.Entry<RollupKey,RollupValue>> cursor;
+
+    private final long rollupNumber;
+
+    public RollupServiceImpl(long rollupNumber) {
+        this.rollupNumber = rollupNumber;
+    }
 
     @Override
     public void cancel(ServiceContext serviceContext) {
@@ -62,7 +57,8 @@ public class RollupServiceImpl implements RollupService, Service {
         @Override
         public void onUpdated(Iterable<CacheEntryEvent<? extends RollupKey, ? extends RollupValue>> cacheEntryEvents) throws CacheEntryListenerException {
             for (var r : cacheEntryEvents) {
-                var l = destCache.invoke(r.getKey().getForeignKey(), (CacheEntryProcessor<Long, RollupValue, Long>) (entry, arguments) -> {
+                var key = new RollupKey(r.getKey().getForeignKey(), rollupNumber);
+                var l = destCache.invoke(key, (CacheEntryProcessor<RollupKey, RollupValue, Long>) (entry, arguments) -> {
                     Long val = null;
                     switch (r.getEventType()) {
                         case CREATED:
@@ -80,7 +76,7 @@ public class RollupServiceImpl implements RollupService, Service {
                         oldVal = entry.getValue().getValue();
                     }
                     if (val != null) {
-                        destCache.put(r.getKey().getForeignKey(), new RollupValue(oldVal + val));
+                        destCache.put(key, new RollupValue(oldVal + val));
                     }
                     return val;
                 });
