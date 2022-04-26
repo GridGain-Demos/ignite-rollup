@@ -35,16 +35,6 @@
             <version>${gridgain.version}</version>
         </dependency>
         <dependency>
-            <groupId>${gridgain.product}</groupId>
-            <artifactId>ignite-spring</artifactId>
-            <version>${gridgain.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${gridgain.product}</groupId>
-            <artifactId>ignite-schedule</artifactId>
-            <version>${gridgain.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
