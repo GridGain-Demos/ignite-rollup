@@ -1,10 +1,7 @@
 package com.gridgain.ps.rollup;
 
 import org.apache.ignite.Ignition;
-import org.apache.ignite.cache.QueryEntity;
 import org.apache.ignite.configuration.CacheConfiguration;
-
-import java.util.Collections;
 
 public class RollupClient {
     public static void main(String[] args) {
@@ -23,7 +20,7 @@ public class RollupClient {
 
             ignite.services().cancel("Rollup 1");
             ignite.services().cancel("Rollup 2");
-            ignite.services().deployNodeSingleton("Rollup 1", new RollupServiceImpl(1));
+            ignite.services().deployNodeSingleton("Rollup 1", new EventRollupServiceImpl(1));
             var rollup2 = new TimedRollupServiceImpl(2, 1_000);
             ignite.services().deployNodeSingleton("Rollup 2", rollup2);
         }

@@ -17,7 +17,7 @@ import javax.cache.event.CacheEntryEvent;
 import javax.cache.event.CacheEntryListenerException;
 import javax.cache.event.CacheEntryUpdatedListener;
 
-public class RollupServiceImpl implements RollupService, Service {
+public class EventRollupServiceImpl implements RollupService, Service {
     @IgniteInstanceResource
     Ignite ignite;
     @LoggerResource
@@ -31,7 +31,7 @@ public class RollupServiceImpl implements RollupService, Service {
 
     private final long rollupNumber;
 
-    public RollupServiceImpl(long rollupNumber) {
+    public EventRollupServiceImpl(long rollupNumber) {
         this.rollupNumber = rollupNumber;
     }
 
