@@ -1,4 +1,4 @@
-package com.gridgain.ps.rollup;
+package com.gridgain.demo.rollup;
 
 import org.apache.ignite.configuration.IgniteConfiguration;
 

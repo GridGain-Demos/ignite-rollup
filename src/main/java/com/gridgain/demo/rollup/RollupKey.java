@@ -1,4 +1,4 @@
-package com.gridgain.ps.rollup;
+package com.gridgain.demo.rollup;
 
 import lombok.Value;
 import org.apache.ignite.cache.affinity.AffinityKeyMapped;
