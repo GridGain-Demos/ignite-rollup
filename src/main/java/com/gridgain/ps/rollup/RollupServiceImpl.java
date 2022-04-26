@@ -2,11 +2,13 @@ package com.gridgain.ps.rollup;
 
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
+import org.apache.ignite.IgniteLogger;
 import org.apache.ignite.cache.CacheEntryProcessor;
 import org.apache.ignite.cache.query.ContinuousQuery;
 import org.apache.ignite.cache.query.QueryCursor;
 import org.apache.ignite.lang.IgniteAsyncCallback;
 import org.apache.ignite.resources.IgniteInstanceResource;
+import org.apache.ignite.resources.LoggerResource;
 import org.apache.ignite.services.Service;
 import org.apache.ignite.services.ServiceContext;
 
@@ -18,6 +20,8 @@ import javax.cache.event.CacheEntryUpdatedListener;
 public class RollupServiceImpl implements RollupService, Service {
     @IgniteInstanceResource
     Ignite ignite;
+    @LoggerResource
+    IgniteLogger log;
 
     private IgniteCache<RollupKey,RollupValue> sourceCache;
     private IgniteCache<RollupKey,RollupValue> destCache;
@@ -33,6 +37,7 @@ public class RollupServiceImpl implements RollupService, Service {
 
     @Override
     public void cancel(ServiceContext serviceContext) {
+        log.info("Cancelling service " + serviceContext.name());
         if (cursor != null) {
             cursor.close();
         }
@@ -40,6 +45,7 @@ public class RollupServiceImpl implements RollupService, Service {
 
     @Override
     public void init(ServiceContext serviceContext) throws Exception {
+        log.info("Initialising service " + serviceContext.name());
         sourceCache = ignite.cache("BASE");
         destCache = ignite.cache("ROLLUP");
         listener = new ContinuousQuery<>();
@@ -49,6 +55,7 @@ public class RollupServiceImpl implements RollupService, Service {
 
     @Override
     public void execute(ServiceContext serviceContext) throws Exception {
+        log.info("Executing service " + serviceContext.name());
         cursor = sourceCache.query(listener);
     }
 
