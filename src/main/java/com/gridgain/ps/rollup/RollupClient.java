@@ -21,8 +21,11 @@ public class RollupClient {
                     .setIndexedTypes(RollupKey.class, RollupValue.class);
             var rollupCache = ignite.getOrCreateCache(rollupTableConfiguration);
 
+            ignite.services().cancel("Rollup 1");
+            ignite.services().cancel("Rollup 2");
             ignite.services().deployNodeSingleton("Rollup 1", new RollupServiceImpl(1));
-            ignite.services().deployNodeSingleton("Rollup 2", new TimedRollupServiceImpl(2));
+            var rollup2 = new TimedRollupServiceImpl(2, 1_000);
+            ignite.services().deployNodeSingleton("Rollup 2", rollup2);
         }
     }
 }
