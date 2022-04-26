@@ -76,7 +76,7 @@ public class RollupServiceImpl implements RollupService, Service {
                         oldVal = entry.getValue().getValue();
                     }
                     if (val != null) {
-                        destCache.put(key, new RollupValue(oldVal + val));
+                        entry.setValue(new RollupValue(oldVal + val));
                     }
                     return val;
                 });
